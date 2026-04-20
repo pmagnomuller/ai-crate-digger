@@ -1,0 +1,12 @@
+import { Module } from '@nestjs/common';
+import { AiModule } from '../ai/ai.module';
+import { TtsModule } from '../tts/tts.module';
+import { ChatController } from './chat.controller';
+import { ChatService } from './chat.service';
+
+@Module({
+  imports: [AiModule, TtsModule],
+  controllers: [ChatController],
+  providers: [ChatService],
+})
+export class ChatModule {}

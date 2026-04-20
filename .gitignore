@@ -1,0 +1,12 @@
+node_modules
+dist
+
+# Local-only (not in git history)
+docs/APP-AND-INTERVIEW-GUIDE.md
+client/dist
+.env
+.env.local
+coverage
+*.log
+audio-cache
+node_modules
