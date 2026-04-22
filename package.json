@@ -12,6 +12,7 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:eval": "jest --config ./test/jest-e2e.json --testRegex \".*\\.eval-spec\\.ts$\"",
     "seed:discogs": "ts-node -r tsconfig-paths/register src/seed/discogs.seed.ts",
     "dev:client": "vite --config client/vite.config.ts",
     "build:client": "vite build --config client/vite.config.ts"

@@ -133,4 +133,4 @@ Configure in GitHub and Azure Container Apps: `AZURE_CREDENTIALS`, `ACR_NAME`, `
 
 ---
 
-More depth: [`docs/Architecture.md`](docs/Architecture.md), [`docs/Infrastructure.md`](docs/Infrastructure.md). A local-only interview companion guide can live at `docs/APP-AND-INTERVIEW-GUIDE.md` (gitignored).
+More depth: [`docs/Architecture.md`](docs/Architecture.md), [`docs/Infrastructure.md`](docs/Infrastructure.md), [`docs/Evals.md`](docs/Evals.md). A local-only interview companion guide can live at `docs/APP-AND-INTERVIEW-GUIDE.md` (gitignored).

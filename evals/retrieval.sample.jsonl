@@ -1,0 +1,4 @@
+{"name":"deep-house-under-30","query":"warm deep house for sunset under 30","limit":6,"expectAnyGenres":["Electronic","House"]}
+{"name":"jazz-classics","query":"classic jazz trio records","limit":6,"expectAnyGenres":["Jazz"]}
+{"name":"ambient-chill","query":"ambient chill listening","limit":6,"expectAnyGenres":["Electronic","Ambient"]}
+{"name":"label-filter","query":"groovy disco edits","label":"Ninja Tune","limit":6,"expectLabelIncludes":"ninja tune"}
