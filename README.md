@@ -4,6 +4,9 @@
 
 AI Crate Digger bridges fuzzy taste (“warm deep house for a sunset”) with **your** vinyl catalog: semantic search over ingested records, then streaming answers grounded in real titles — not generic model guesses.
 
+
+**Writeup:** [Teaching a Model My Taste for the Vinyl Bins](https://pedro-muller.com/projects/ai-crate-digger/) on my blog.
+
 ---
 
 ## What you get
