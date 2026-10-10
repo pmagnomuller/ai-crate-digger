@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EmbeddingsService } from '../ai/embeddings.service';
+import { antiAiCatalogMatch } from '../common/anti-ai-music';
 import { RecordDocument, RecordEntity } from './schemas/record.schema';
 import { SearchRecordsDto } from './dto/search-records.dto';
 
@@ -47,6 +48,8 @@ export class RecordsService {
     }
     if (dto.label) matchStage.label = new RegExp(dto.label, 'i');
     const pipeline: Record<string, unknown>[] = [];
+    // Hard rule: never surface AI-generated music from the catalog.
+    pipeline.push({ $match: antiAiCatalogMatch() });
     if (Object.keys(matchStage).length > 0) {
       pipeline.push({ $match: matchStage });
     }
