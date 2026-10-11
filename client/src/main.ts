@@ -5,58 +5,89 @@ const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('#app missing');
 
 app.innerHTML = `
-  <header class="top">
-    <h1>AI Crate Digger</h1>
-    <p class="policy">Human music only — we never recommend AI-generated tracks.</p>
-  </header>
-
-  <section class="panel" id="connectPanel" aria-labelledby="connectHeading">
-    <h2 id="connectHeading">1. Connect Spotify</h2>
-    <p class="hint">Link your Spotify account to build a taste profile from your top artists and tracks.</p>
-    <div class="row">
-      <a class="button" id="connectSpotify" href="/auth/spotify/login">Connect Spotify</a>
-      <button type="button" id="logout" class="ghost" hidden>Log out</button>
+  <section class="hero" aria-label="AI Crate Digger">
+    <div class="hero-copy">
+      <h1 class="brand">AI Crate Digger</h1>
+      <p class="hero-headline">Your listening taste, dug into human vinyl.</p>
+      <p class="hero-support">
+        Connect Spotify, shape one taste profile, and get catalog picks grounded in real records — never AI-generated music.
+      </p>
+      <div class="cta-group">
+        <a class="btn btn-primary" id="connectSpotify" href="/auth/spotify/login">Connect Spotify</a>
+        <a class="btn btn-secondary" href="#taste">See how it works</a>
+        <button type="button" class="btn btn-ghost" id="logout" hidden>Log out</button>
+      </div>
+      <p id="authStatus" class="status-line" aria-live="polite"></p>
     </div>
-    <p id="authStatus" class="status" aria-live="polite"></p>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="vinyl-stage">
+        <div class="vinyl-glow"></div>
+        <div class="vinyl"></div>
+      </div>
+    </div>
   </section>
 
-  <section class="panel" id="tastePanel" aria-labelledby="tasteHeading">
-    <h2 id="tasteHeading">2. Taste profile</h2>
-    <p class="hint">We store a MongoDB taste document and embed it with Azure text embeddings.</p>
-    <div class="row">
-      <button type="button" id="syncTaste" disabled>Sync taste from Spotify</button>
-      <button type="button" id="loadTaste" class="ghost" disabled>Refresh view</button>
-    </div>
-    <div id="tasteOut" class="output taste" aria-live="polite">Not synced yet.</div>
-  </section>
+  <main class="flow">
+    <section class="section" id="taste" aria-labelledby="tasteHeading">
+      <div class="section-head">
+        <p class="section-kicker">Taste</p>
+        <h2 id="tasteHeading">Build your digger profile</h2>
+        <p>We pull top artists and tracks from Spotify, store one taste document, and embed it for matching.</p>
+      </div>
+      <div class="toolbar">
+        <button type="button" class="btn btn-primary" id="syncTaste" disabled>Sync taste from Spotify</button>
+        <button type="button" class="btn btn-secondary" id="loadTaste" disabled>Refresh</button>
+      </div>
+      <div class="interaction-shell" id="tasteOut" aria-live="polite">
+        <p class="taste-empty">Connect Spotify, then sync to see genres, artists, and your taste summary.</p>
+      </div>
+    </section>
 
-  <section class="panel" id="recsPanel" aria-labelledby="recsHeading">
-    <h2 id="recsHeading">3. Recommendations</h2>
-    <p class="hint">Grounded in the vinyl catalog via your taste embedding. AI-generated music is filtered out.</p>
-    <div class="row">
-      <button type="button" id="getRecs" disabled>Get recommendations</button>
-    </div>
-    <div id="recsOut" class="output" aria-live="polite"></div>
-  </section>
+    <section class="section" id="recs" aria-labelledby="recsHeading">
+      <div class="section-head">
+        <p class="section-kicker">Recommendations</p>
+        <h2 id="recsHeading">Picks from the crates</h2>
+        <p>Ranked against your taste embedding in the vinyl catalog. Human-made releases only.</p>
+      </div>
+      <div class="toolbar">
+        <button type="button" class="btn btn-primary" id="getRecs" disabled>Get recommendations</button>
+      </div>
+      <div class="interaction-shell" id="recsOut" aria-live="polite">
+        <p class="recs-empty">Sync taste first, then pull a short list of grounded recommendations.</p>
+      </div>
+    </section>
 
-  <section class="panel chat-panel" aria-labelledby="chatHeading">
-    <h2 id="chatHeading">Chat (optional)</h2>
-    <p class="hint">Catalog chat still available. Same anti-AI rule applies in the assistant prompt.</p>
-    <div class="row">
-      <label><input type="checkbox" id="includeAudio" /> Include audio in SSE</label>
-      <label>Voice <select id="voice"><option value="nova">nova</option><option value="onyx">onyx</option></select></label>
-    </div>
-    <textarea id="prompt" placeholder="Ask about records…" spellcheck="true"></textarea>
-    <div class="row" style="margin-top:0.75rem">
-      <button type="button" id="send">Send</button>
-      <button type="button" id="speak" disabled>Play last answer (TTS)</button>
-    </div>
-    <div id="meta" class="output meta"></div>
-    <div id="out" class="output" aria-live="polite"></div>
-  </section>
+    <section class="section" id="chat" aria-labelledby="chatHeading">
+      <div class="section-head">
+        <p class="section-kicker">Ask</p>
+        <h2 id="chatHeading">Talk with the digger</h2>
+        <p>Optional catalog chat for vibes, budget, and follow-ups — still bound to human music only.</p>
+      </div>
+      <div class="interaction-shell">
+        <div class="chat-compose">
+          <textarea id="prompt" placeholder="e.g. Late-night deep house under $30, warm and dusty…" spellcheck="true"></textarea>
+          <div class="chat-options">
+            <label><input type="checkbox" id="includeAudio" /> Include audio in stream</label>
+            <label>Voice
+              <select id="voice">
+                <option value="nova">nova</option>
+                <option value="onyx">onyx</option>
+              </select>
+            </label>
+          </div>
+          <div class="toolbar" style="margin-bottom:0">
+            <button type="button" class="btn btn-primary" id="send">Send</button>
+            <button type="button" class="btn btn-secondary" id="speak" disabled>Play last answer</button>
+          </div>
+        </div>
+        <div id="meta" class="chat-meta"></div>
+        <div id="out" class="chat-answer" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
 
-  <div id="err" class="error" role="alert"></div>
-  <audio id="player" controls></audio>
+  <p id="err" class="error-banner" role="alert"></p>
+  <audio id="player" class="site-audio" controls></audio>
 `;
 
 type PublicUser = { id: string; spotifyId: string; displayName?: string; email?: string };
@@ -71,18 +102,20 @@ type TasteProfile = {
   sourcePlatform: string;
 };
 
+type RecItem = {
+  id: string;
+  title: string;
+  artist: string;
+  label: string;
+  genre: string[];
+  price: number;
+  similarity: number;
+  whyItFits: string[];
+};
+
 type RecResponse = {
   policy: string;
-  recommendations: Array<{
-    id: string;
-    title: string;
-    artist: string;
-    label: string;
-    genre: string[];
-    price: number;
-    similarity: number;
-    whyItFits: string[];
-  }>;
+  recommendations: RecItem[];
 };
 
 const el = {
@@ -101,7 +134,7 @@ const el = {
   voice: app.querySelector<HTMLSelectElement>('#voice')!,
   out: app.querySelector<HTMLDivElement>('#out')!,
   meta: app.querySelector<HTMLDivElement>('#meta')!,
-  err: app.querySelector<HTMLDivElement>('#err')!,
+  err: app.querySelector<HTMLParagraphElement>('#err')!,
   player: app.querySelector<HTMLAudioElement>('#player')!,
 };
 
@@ -122,8 +155,8 @@ function setAuthedUi(user: PublicUser | null) {
   el.loadTaste.disabled = !authed;
   el.getRecs.disabled = !authed;
   el.authStatus.textContent = user
-    ? `Connected as ${user.displayName ?? user.spotifyId} (Spotify)`
-    : 'Not connected.';
+    ? `Connected as ${user.displayName ?? user.spotifyId}`
+    : 'Not connected yet.';
 }
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
@@ -150,42 +183,78 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
 function renderTaste(taste: TasteProfile) {
+  const genreLine = taste.genres.slice(0, 12).map(escapeHtml).join(' · ');
   const artists = taste.topArtists
     .slice(0, 8)
-    .map((a) => a.name)
-    .join(', ');
+    .map((a) => `<li>${escapeHtml(a.name)}</li>`)
+    .join('');
   const tracks = taste.topTracks
     .slice(0, 6)
-    .map((t) => `${t.name} — ${t.artist}`)
-    .join('\n');
-  el.tasteOut.textContent = [
-    `Platform: ${taste.sourcePlatform}`,
-    `Embedding: ${taste.hasEmbedding ? 'ready' : 'missing'}`,
-    `Synced: ${taste.lastSyncedAt ?? 'unknown'}`,
-    `Genres: ${taste.genres.slice(0, 12).join(', ') || '(none)'}`,
-    `Top artists: ${artists || '(none)'}`,
-    tracks ? `Top tracks:\n${tracks}` : '',
-    '',
-    `Summary: ${taste.summaryText}`,
-  ]
-    .filter((line) => line !== undefined)
-    .join('\n');
+    .map((t) => `<li>${escapeHtml(t.name)} — ${escapeHtml(t.artist)}</li>`)
+    .join('');
+
+  el.tasteOut.innerHTML = `
+    <div class="taste-grid">
+      <p class="taste-summary">${escapeHtml(taste.summaryText)}</p>
+      <div class="meta-row">
+        <span>Source: ${escapeHtml(taste.sourcePlatform)}</span>
+        <span>Embedding: ${taste.hasEmbedding ? 'ready' : 'missing'}</span>
+        <span>Synced: ${escapeHtml(taste.lastSyncedAt ?? 'unknown')}</span>
+      </div>
+      ${genreLine ? `<p class="genre-line">${genreLine}</p>` : ''}
+      ${artists ? `<div><strong>Top artists</strong><ul class="signal-list">${artists}</ul></div>` : ''}
+      ${tracks ? `<div><strong>Top tracks</strong><ul class="signal-list">${tracks}</ul></div>` : ''}
+    </div>
+  `;
+}
+
+function renderTasteEmpty(message: string) {
+  el.tasteOut.innerHTML = `<p class="taste-empty">${escapeHtml(message)}</p>`;
 }
 
 function renderRecs(data: RecResponse) {
   if (!data.recommendations.length) {
-    el.recsOut.textContent = 'No catalog matches yet. Seed Discogs records with embeddings, then retry.';
+    el.recsOut.innerHTML =
+      '<p class="recs-empty">No catalog matches yet. Seed Discogs records with embeddings, then retry.</p>';
     return;
   }
-  el.recsOut.textContent = [
-    data.policy,
-    '',
-    ...data.recommendations.map((r, i) => {
-      const why = r.whyItFits.map((w) => `   - ${w}`).join('\n');
-      return `${i + 1}. ${r.artist} — ${r.title} (${r.label})\n   genres: ${(r.genre ?? []).join(', ') || 'n/a'} · $${r.price} · sim ${r.similarity.toFixed(3)}\n${why}`;
-    }),
-  ].join('\n');
+
+  const items = data.recommendations
+    .map((r, i) => {
+      const why = (r.whyItFits ?? [])
+        .map((w) => `<li>${escapeHtml(w)}</li>`)
+        .join('');
+      return `
+        <li class="rec-item">
+          <span class="rec-index">${i + 1}</span>
+          <div>
+            <h3>${escapeHtml(r.artist)} — ${escapeHtml(r.title)}</h3>
+            <p class="meta">${escapeHtml(r.label)} · ${(r.genre ?? []).map(escapeHtml).join(', ') || 'n/a'} · $${r.price}</p>
+            ${why ? `<ul class="why">${why}</ul>` : ''}
+          </div>
+          <span class="rec-sim">${r.similarity.toFixed(3)}</span>
+        </li>
+      `;
+    })
+    .join('');
+
+  el.recsOut.innerHTML = `
+    <p class="policy-note">${escapeHtml(data.policy)}</p>
+    <ul class="recs-list">${items}</ul>
+  `;
+}
+
+function renderRecsEmpty(message: string) {
+  el.recsOut.innerHTML = `<p class="recs-empty">${escapeHtml(message)}</p>`;
 }
 
 async function refreshSession() {
@@ -196,7 +265,7 @@ async function refreshSession() {
       const taste = await api<TasteProfile>('/taste');
       renderTaste(taste);
     } catch {
-      el.tasteOut.textContent = 'Connected. Sync taste from Spotify to continue.';
+      renderTasteEmpty('Connected. Sync taste from Spotify to continue.');
     }
   } catch {
     setAuthedUi(null);
@@ -219,7 +288,7 @@ function handleEvent(ev: ChatSseEvent, streamingText: { current: string }) {
       el.out.textContent = streamingText.current;
       break;
     case 'tool_call':
-      appendMeta(`tool_call: ${ev.data.toolName}(${JSON.stringify(ev.data.args)})`);
+      appendMeta(`tool_call: ${ev.data.toolName}`);
       break;
     case 'tool_result':
       appendMeta(`tool_result: ${ev.data.toolName}`);
@@ -229,16 +298,9 @@ function handleEvent(ev: ChatSseEvent, streamingText: { current: string }) {
       el.out.textContent = ev.data.text;
       lastAnswerText = ev.data.text;
       el.speak.disabled = !lastAnswerText.trim();
-      if (ev.data.audio?.base64Audio && ev.data.audio.mimeType) {
-        appendMeta(`final_answer: inline ${ev.data.audio.mimeType} (${ev.data.audio.base64Audio.length} b64 chars)`);
-      } else {
-        appendMeta(
-          'final_answer: text only (no inline audio — check tts_error above or use “Play last answer”)',
-        );
-      }
       break;
     }
-    case 'tts_truncated':
+    case 'tts_truncate':
       appendMeta(
         `tts_truncate: answer was ${ev.data.originalChars} chars; first ${ev.data.sentChars} sent to TTS`,
       );
@@ -255,13 +317,72 @@ function handleEvent(ev: ChatSseEvent, streamingText: { current: string }) {
   }
 }
 
+/** Design preview of filled taste/recs when live Spotify isn’t available. */
+function loadPreviewState() {
+  setAuthedUi({
+    id: 'preview',
+    spotifyId: 'preview-user',
+    displayName: 'Preview listener',
+  });
+  el.authStatus.textContent = 'Preview mode — sample taste & recommendations (not live Spotify).';
+  renderTaste({
+    sourcePlatform: 'spotify',
+    hasEmbedding: true,
+    lastSyncedAt: new Date().toISOString(),
+    genres: ['deep house', 'jazz', 'broken beat', 'soul'],
+    topArtists: [
+      { name: 'Moodymann', genres: ['house'] },
+      { name: 'Madlib', genres: ['hip hop'] },
+      { name: 'Theo Parrish', genres: ['electronic'] },
+    ],
+    topTracks: [
+      { name: 'Dem Young Lights', artist: 'Moodymann' },
+      { name: 'Road of the Lonely Ones', artist: 'Madlib' },
+    ],
+    summaryText:
+      "Preview listener's music taste profile from Spotify (human-made music only). Favorite genres: deep house, jazz, broken beat, soul. Prefer physical vinyl and human-performed releases.",
+  });
+  renderRecs({
+    policy:
+      'Never recommend AI-generated music. Results are grounded in the vinyl catalog and your Spotify taste embedding.',
+    recommendations: [
+      {
+        id: '1',
+        title: 'Dem Young Lights',
+        artist: 'Moodymann',
+        label: 'KDJ',
+        genre: ['House'],
+        price: 28,
+        similarity: 0.91,
+        whyItFits: [
+          'Matches a top Spotify artist: Moodymann',
+          'Human-made catalog release (AI-generated music excluded)',
+        ],
+      },
+      {
+        id: '2',
+        title: 'Black Jazz Signature',
+        artist: 'Various',
+        label: 'Black Jazz',
+        genre: ['Jazz'],
+        price: 32,
+        similarity: 0.84,
+        whyItFits: [
+          'Overlaps your Spotify genres: jazz',
+          'Human-made catalog release (AI-generated music excluded)',
+        ],
+      },
+    ],
+  });
+}
+
 const params = new URLSearchParams(window.location.search);
 if (params.get('authError')) {
   setError(`Spotify auth failed: ${params.get('authError')}`);
 }
 if (params.get('connected') === 'spotify') {
   el.authStatus.textContent = 'Spotify connected — sync your taste next.';
-  window.history.replaceState({}, '', '/');
+  window.history.replaceState({}, '', window.location.pathname);
 }
 
 el.logout.addEventListener('click', async () => {
@@ -269,8 +390,8 @@ el.logout.addEventListener('click', async () => {
   try {
     await api('/auth/logout', { method: 'POST' });
     setAuthedUi(null);
-    el.tasteOut.textContent = 'Not synced yet.';
-    el.recsOut.textContent = '';
+    renderTasteEmpty('Connect Spotify, then sync to see genres, artists, and your taste summary.');
+    renderRecsEmpty('Sync taste first, then pull a short list of grounded recommendations.');
   } catch (e) {
     setError(e instanceof Error ? e.message : String(e));
   }
@@ -279,7 +400,7 @@ el.logout.addEventListener('click', async () => {
 el.syncTaste.addEventListener('click', async () => {
   setError('');
   el.syncTaste.disabled = true;
-  el.tasteOut.textContent = 'Syncing from Spotify and embedding taste…';
+  renderTasteEmpty('Syncing from Spotify and embedding taste…');
   try {
     const taste = await api<TasteProfile>('/taste/sync', { method: 'POST' });
     renderTaste(taste);
@@ -303,13 +424,13 @@ el.loadTaste.addEventListener('click', async () => {
 el.getRecs.addEventListener('click', async () => {
   setError('');
   el.getRecs.disabled = true;
-  el.recsOut.textContent = 'Ranking catalog against your taste embedding…';
+  renderRecsEmpty('Ranking catalog against your taste embedding…');
   try {
     const data = await api<RecResponse>('/recommendations?limit=8');
     renderRecs(data);
   } catch (e) {
     setError(e instanceof Error ? e.message : String(e));
-    el.recsOut.textContent = '';
+    renderRecsEmpty('Could not load recommendations.');
   } finally {
     el.getRecs.disabled = !currentUser;
   }
@@ -362,7 +483,7 @@ el.speak.addEventListener('click', async () => {
     lastObjectUrl = URL.createObjectURL(blob);
     el.player.src = lastObjectUrl;
     await el.player.play().catch(() => {
-      /* autoplay may be blocked until user gesture — button click counts */
+      /* autoplay may be blocked until user gesture */
     });
   } catch (e) {
     setError(e instanceof Error ? e.message : String(e));
@@ -371,4 +492,8 @@ el.speak.addEventListener('click', async () => {
   }
 });
 
-void refreshSession();
+if (params.get('preview') === '1') {
+  loadPreviewState();
+} else {
+  void refreshSession();
+}
