@@ -32,6 +32,10 @@ export class RecordEntity {
   @Prop()
   notes?: string;
 
+  /** When true, catalog search and recommendations must exclude this row. */
+  @Prop({ default: false, index: true })
+  isAiGenerated!: boolean;
+
   @Prop({ type: [Number], default: [] })
   embedding!: number[];
 }

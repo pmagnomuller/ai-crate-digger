@@ -4,9 +4,17 @@ export default (): Record<string, unknown> => {
   const parsed = envSchema.parse(process.env);
   return {
     port: parsed.PORT,
+    nodeEnv: parsed.NODE_ENV,
     mongoUri: parsed.MONGODB_URI,
     discogsToken: parsed.DISCOGS_USER_TOKEN,
     discogsSeedTarget: parsed.DISCOGS_SEED_TARGET,
+    sessionSecret: parsed.SESSION_SECRET,
+    clientOrigin: parsed.CLIENT_ORIGIN,
+    spotify: {
+      clientId: parsed.SPOTIFY_CLIENT_ID,
+      clientSecret: parsed.SPOTIFY_CLIENT_SECRET,
+      redirectUri: parsed.SPOTIFY_REDIRECT_URI,
+    },
     azureOpenAI: {
       endpoint: parsed.AZURE_OPENAI_ENDPOINT,
       apiKey: parsed.AZURE_OPENAI_API_KEY,

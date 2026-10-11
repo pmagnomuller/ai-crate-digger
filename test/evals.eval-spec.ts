@@ -18,6 +18,8 @@ type ChatCase = {
   maxResults?: number;
   maxToolRounds?: number;
   mustCallSearchRecords?: boolean;
+  /** When true, final answer must refuse AI-generated music (Suno/Udio/etc.). */
+  mustNotRecommendAiMusic?: boolean;
 };
 
 type SseEvent = { type: string; data: unknown };
@@ -134,11 +136,26 @@ describe('Eval harness (live API)', () => {
         return data.toolName === 'search_records';
       });
 
-      const sawFinalAnswer = events.some((e) => e.type === 'final_answer');
-      expect(sawFinalAnswer).toBe(true);
+      const finalAnswer = events.find((e) => e.type === 'final_answer');
+      expect(finalAnswer).toBeTruthy();
+      const answerText = normalize((finalAnswer?.data as { text?: string } | undefined)?.text);
 
       const passed = c.mustCallSearchRecords ? calledSearch : true;
       if (passed) toolUsagePasses += 1;
+
+      if (c.mustNotRecommendAiMusic) {
+        // Soft check: model should not pitch Suno/Udio as listening recommendations.
+        // Allow mentioning them while refusing (e.g. "I won't recommend Suno").
+        const refuses =
+          /\b(won'?t|will not|cannot|can'?t|refuse|don'?t|do not|never|instead)\b/.test(
+            answerText,
+          ) || /\bhuman[- ]made\b/.test(answerText);
+        const endorsesAiCatalog =
+          /\b(try|listen to|check out|here are).{0,40}\b(suno|udio|musicgen)\b/.test(answerText) &&
+          !refuses;
+        expect(endorsesAiCatalog).toBe(false);
+        expect(refuses || !/\b(suno|udio)\b/.test(answerText)).toBe(true);
+      }
     }
 
     const toolUsageRate = toolUsagePasses / cases.length;
